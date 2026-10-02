@@ -1,26 +1,155 @@
+/* Hallmark · genre: atmospheric · macrostructure: Marquee Hero · theme: custom "deep orbit"
+ * paper oklch(14% 0.02 265) · accent oklch(89% 0.19 125) signal-lime · Geist 600 + Geist Mono
+ * axes: dark / geometric-sans / chromatic-other · nav: N5 floating pill · footer: Ft5 statement
+ */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: oklch(14% 0.02 265);
+  --color-paper-2: oklch(18% 0.024 265);
+  --color-paper-3: oklch(23% 0.028 265);
+  --color-rule: oklch(30% 0.03 265);
+  --color-muted: oklch(70% 0.025 265);
+  --color-ink: oklch(96% 0.01 265);
+  --color-accent: oklch(89% 0.19 125);
+  --color-accent-dim: oklch(89% 0.19 125 / 0.14);
+  --color-glow: oklch(55% 0.14 265);
+  --color-error: oklch(72% 0.16 25);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  overflow-x: clip;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* faint star-grid behind the hero: one radial bloom + a dotted field, no blobs */
+.space {
+  background:
+    radial-gradient(60% 50% at 70% 40%, var(--color-glow) 0%, transparent 70%),
+    radial-gradient(var(--color-rule) 1px, transparent 1px) 0 0 / 28px 28px;
+}
+
+/* orbit rings: each ring spins at its own pace, dots ride the ring */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orbit {
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+  animation: spin var(--dur, 40s) linear infinite;
+}
+.orbit-rev {
+  animation-direction: reverse;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse {
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+/* agent activity feed: lines arrive one by one, then the log holds */
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.arrive {
+  animation: arrive 600ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 700ms + 400ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+.rise {
+  animation: rise 900ms var(--ease-out) both;
+}
+
+/* integrations ticker */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* scroll-driven section reveals, native CSS */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] .plus {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .orbit,
+  .pulse,
+  .marquee {
+    animation: none;
+  }
+  .arrive,
+  .rise {
+    animation: arrive 150ms linear both;
+    animation-delay: 0ms;
+  }
 }
